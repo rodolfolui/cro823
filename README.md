@@ -89,8 +89,8 @@ localhost/cro                        8.2.3         0
 
 There are 4 scripts to execute previous steps in a quick way on a RHEL system with internet access:
 
-- comandos829        Installation shell script (requires a local folder named 829 to copy installers)
-- Dockerfile.cro829  Dockerfile to build RO 8.2.3 images
+- comandos823        Installation shell script (requires a local folder named 823 to copy installers)
+- Dockerfile.cro823  Dockerfile to build RO 8.2.3 images
 - Dockerfile.mariadb Dockerfile to build MariaDB 10.5.9 image
 - instcro            RO installation script
 
