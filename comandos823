@@ -1,0 +1,22 @@
+# Copiar los medios de instalación
+[ -f cro823/Server_BundledTomcat.tar.gz ] || cp /home/rvasquez/DownloadDirector/CRO823/Server_BundledTomcat.tar.gz cro823
+[ -f cro823/gnulib.zip ] || wget -O cro823/gnulib.zip https://sourceforge.net/projects/gnu-utils/files/binaries/gnulib.zip/download 
+[ -f cro823/ThirdPartyJSLib.zip ] || wget -O cro823/ThirdPartyJSLib.zip https://sourceforge.net/projects/gnu-utils/files/binaries/ThirdPartyJSLib.zip/download
+[ -f cro823/my.cnf ] || cp my.cnf cro823
+[ -f cro823/mariadbencryption.tar.gz ] || cp mariadbencryption.tar.gz cro823
+
+# Crear volumen para albergar los medios de instalacion
+podman volume create cro823
+
+# Subir una instancia de ubuntu y copiar los instaladores
+podman run --rm --name base1 --volume cro823:/install registry.access.redhat.com/ubi8/ubi bash -c "tail -f /dev/null" &
+sleep 5
+podman cp cro823/Server_BundledTomcat.tar.gz base1:/install/
+podman cp cro823/gnulib.zip base1:/install/
+podman cp cro823/ThirdPartyJSLib.zip base1:/install/
+podman exec -i -t base1 /bin/bash -c "cd /install/ ; [ -f install.bin ] || tar xvzf Server_BundledTomcat.tar.gz; rm Server_BundledTomcat.tar.gz" && podman stop base1 && podman rm base1
+
+# Preparar los prerequisitos de CRO
+podman build -f Dockerfile.cro823 --tag localhost/cro:823
+#podman run --rm -it -v cro823:/install --name crort localhost/cro:823 bash -c /instcro && podman commit crort cro:823
+podman run --rm -it -v cro823:/install --name crort localhost/cro:823 bash
