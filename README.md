@@ -21,14 +21,14 @@ Prepare a Virtual Machine with RHEL 8.x (Linux Red Hat Enterprise) or Ubuntu wit
 
 ### Pre-requisite preparation
 
-    1. Import and run RHEL 8.4 UBI (minimal) base image
-        $ docker run -it --name cro -h crort -p 8080:8080 registry.access.redhat.com/ubi8/ubi:8.4 bash
+    1. Import and run RHEL 8 UBI (minimal) base image
+        $ docker run -it --name cro -h crort -p 8080:8080 registry.access.redhat.com/ubi8/ubi bash
         
     2. Install library
        [root@crort /]# dnf -y install hostname libXtst net-tools iputils procps-ng rsync sudo unzip wget
        
-    3. Download Tomcat 9.0.54 and install on /opt
-       [root@crort /]# wget -qO- https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.54/bin/apache-tomcat-9.0.54.tar.gz | tar -xzf - -C /opt
+    3. Download Tomcat 9.0.48 and install on /opt
+       [root@crort /]# wget -qO- https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.48/bin/apache-tomcat-9.0.48.tar.gz | tar -xzf - -C /opt
        
     4. Download MariaDB 10.5.9 installation rpm's
        [root@crort /]# wget https://downloads.mariadb.com/MariaDB/mariadb-10.5.9/yum/rhel8-amd64/rpms/MariaDB-shared-10.5.9-1.el8.x86_64.rpm
@@ -61,9 +61,10 @@ Prepare a Virtual Machine with RHEL 8.x (Linux Red Hat Enterprise) or Ubuntu wit
        > s/SUPPORT_USER_PASSWORD=/SUPPORT_USER_PASSWORD=Orchestration123./
        > s/SANOVI_USER_PASSWORD=/SANOVI_USER_PASSWORD=Orchestration123./
        > s/MODIFY_SYSTEM_FILES=0/MODIFY_SYSTEM_FILES=1/
-       > s/TOMCAT_HOME=.*/TOMCAT_HOME=\/opt\/apache-tomcat-9.0.37/' /tmp/PanacesServerInstaller.properties > /tmp/PanacesServerCro.properties
+       > s/TOMCAT_HOME=.*/TOMCAT_HOME=\/opt\/apache-tomcat-9.0.48/' /tmp/PanacesServerInstaller.properties > /tmp/PanacesServerCro.properties
        [root@crort /]# /tmp/install.bin -f /tmp/PanacesServerCro.properties
-    3. Ejecute los pasos post instalación descritos en la guia de instalación de CRO a partir de la página 85 (numeral 5.6) para el modo consola
+       
+    3. Execute post-installation steps on RO Install guide on page 85 (numeral 5.6) console mode
 
 ### Start RO services
 
@@ -177,7 +178,3 @@ There are 4 scripts to execute previous steps in a quick way on a RHEL system wi
        Preparing to install
 
        **Follow RO installation steps**
-
-On 8.2.3 is needed to download a Validation Key from passport advantage. Validation key file value is mandatory for the minor release fresh/upgrade deployments
-
-https://www.ibm.com/software/passportadvantage/pao_customer.html?msclkid=d1d311bec06611ecb044974dd273fc10
