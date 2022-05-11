@@ -43,7 +43,7 @@ run wget http://mirror.centos.org/centos/8/AppStream/x86_64/os/Packages/boost-pr
 RUN yum localinstall -y boost* galera-4* MariaDB-* && rm *.rpm
 
 # Installation script CRO 8.2.3
-COPY instcro /
+COPY instcro823 /
 RUN echo "SELINUX=permissive" >> /etc/selinux/config
 
 # MariaDB port and Tomcat port
