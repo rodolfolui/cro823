@@ -38,11 +38,13 @@ echo "Instalando Resilency Orchestrator"
 /install/install.bin -f /install/PanacesServerInstaller.properties || exit 1
 
 echo "Pasos post instalación - tomcat"
+export TOMCAT_HOME=/opt/panaces/apache-tomcat-9.0.44
+[ -d $TOMCAT_HOME ] || exit 2
 sed -i.bak 's/JAVA_HOME.*/& \
-JAVA_OPTS="$JAVA_OPTS -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses=true "/' /opt/apache-tomcat-9.0.54/bin/setenv.sh
+JAVA_OPTS="$JAVA_OPTS -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses=true "/' $TOMCAT_HOME/bin/setenv.sh
 
-[ -f /opt/panaces/installconfig/Update_Default_Tomcat_Files ] && cp /opt/panaces/installconfig/Update_Default_Tomcat_Files/* /opt/apache-tomcat-9.0.54/webapps/ROOT
-sed -i.bak '$d' /opt/apache-tomcat-9.0.54/conf/web.xml && cat <<! >> /opt/apache-tomcat-9.0.54/conf/web.xml
+[ -f /opt/panaces/installconfig/Update_Default_Tomcat_Files ] && cp /opt/panaces/installconfig/Update_Default_Tomcat_Files/* $TOMCAT_HOME/webapps/ROOT
+sed -i.bak '$d' $TOMCAT_HOME/conf/web.xml && cat <<! >> $TOMCAT_HOME/conf/web.xml
     <error-page\>
         <error-code>404</error-code>
         <location>/index.jsp</location>
@@ -60,8 +62,8 @@ sed -i.bak '$d' /opt/apache-tomcat-9.0.54/conf/web.xml && cat <<! >> /opt/apache
 !
 sed -i.bak 's/SHUTDOWN/Orchestration123./
 s/<\/Host>/<\/Host>\
-      <Valve className="org.apache.catalina.valves.ErrorReportValve" showReport="false" showServerInfo="false"\/>/' /opt/apache-tomcat-9.0.54/conf/server.xml
-sed -i.bak 's/<must-be-changed>/Orchestration123./' /opt/apache-tomcat-9.0.54/conf/tomcat-users.xml
+      <Valve className="org.apache.catalina.valves.ErrorReportValve" showReport="false" showServerInfo="false"\/>/' $TOMCAT_HOME/conf/server.xml
+sed -i.bak 's/<must-be-changed>/Orchestration123./' $TOMCAT_HOME/conf/tomcat-users.xml
 
 sed -i.bak 's/<url-pattern\>\/app\/\*\<\/url-pattern\>/&\
 \<security-constraint\>\
@@ -72,18 +74,18 @@ sed -i.bak 's/<url-pattern\>\/app\/\*\<\/url-pattern\>/&\
 \<user-data-constraint\>\
 \<transport-guarantee\>CONFIDENTIAL\<\/transport-guarantee\>\
 \<\/user-data-constraint\>\
-\<\/security-constraint\>/' /opt/apache-tomcat-9.0.54/webapps/PanacesGUI/WEB-INF/web.xml
+\<\/security-constraint\>/' $TOMCAT_HOME/webapps/PanacesGUI/WEB-INF/web.xml
 
 echo "Pasos post instalación -panaces "
-wget -q https://sourceforge.net/projects/gnu-utils/files/binaries/ThirdPartyJSLib.zip -O /tmp/ThirdPartyJSLib.zip && unzip -qjd /opt/apache-tomcat-9.0.54/webapps/PanacesGUI/scripts/ /tmp/ThirdPartyJSLib.zip
-[ -f /opt/apache-tomcat-9.0.54/webapps/PanacesGUI/WEB-INF/lib/PanacesGUI.jar ] && cp /opt/apache-tomcat-9.0.54/webapps/PanacesGUI/WEB-INF/lib/PanacesGUI.jar /opt/apache-tomcat-9.0.54/webapps/PanacesGUI/WEB-INF/lib/PanacesGUI.jar.bak
+wget -q https://sourceforge.net/projects/gnu-utils/files/binaries/ThirdPartyJSLib.zip -O /tmp/ThirdPartyJSLib.zip && unzip -qjd $TOMCAT_HOME/webapps/PanacesGUI/scripts/ /tmp/ThirdPartyJSLib.zip
+[ -f $TOMCAT_HOME/webapps/PanacesGUI/WEB-INF/lib/PanacesGUI.jar ] && cp $TOMCAT_HOME/webapps/PanacesGUI/WEB-INF/lib/PanacesGUI.jar $TOMCAT_HOME/webapps/PanacesGUI/WEB-INF/lib/PanacesGUI.jar.bak
 
 echo "Pasos post instalación - reportes birt"
-unzip -qd /install /install/birt-runtime-4_3_2.zip && mv /install/birt-runtime-4_3_2/WebViewerExample /opt/apache-tomcat-9.0.54/webapps/birt \
-    && cd /opt/apache-tomcat-9.0.54/webapps && cp -r PanacesGUI/report/ birt && cp PanacesGUI/WEB-INF/lib/mariadb-java-client-2.3.0.jar birt/report \
+unzip -qd /install /install/birt-runtime-4_3_2.zip && mv /install/birt-runtime-4_3_2/WebViewerExample $TOMCAAT_HOME/webapps/birt \
+    && cd $TOMCAT_HOME/webapps && cp -r PanacesGUI/report/ birt && cp PanacesGUI/WEB-INF/lib/mariadb-java-client-2.3.0.jar birt/report \
     && chown -R tomcatuser:tomcatusergroup birt
 
-sed -i.bak 's/JAVA_OPTS="$JAVA_OPTS $JSSE_OPTS"/& -Djavax.xml.transform.TransformerFactory=com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl"/' /opt/apache-tomcat-9.0.54/bin/catalina.sh
+sed -i.bak 's/JAVA_OPTS="$JAVA_OPTS $JSSE_OPTS"/& -Djavax.xml.transform.TransformerFactory=com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl"/' $TOMCAT_HOME/bin/catalina.sh
 
 cd /opt/panaces/bin
 ./SecurityUserInjection.sh
