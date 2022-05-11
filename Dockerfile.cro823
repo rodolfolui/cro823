@@ -47,6 +47,7 @@ COPY instcro /
 RUN echo "SELINUX=permissive" >> /etc/selinux/config
 
 # MariaDB port and Tomcat port
-EXPOSE 3306,8080
+EXPOSE 3306/tcp
+EXPOSE 8080/tcp
 
 CMD ["mysqld"]
