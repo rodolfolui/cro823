@@ -94,8 +94,8 @@ There are 4 scripts to execute previous steps in a quick way on a RHEL system wi
 - Dockerfile.mariadb Dockerfile to build MariaDB 10.5.9 image
 - instcro            RO installation script
 
-       [root@crort /]# ./comandos829
-       cro829
+       [root@crort /]# ./comandos823
+       cro823
        EULA.txt
        install.bin
        PanacesServerInstaller.properties
