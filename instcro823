@@ -45,7 +45,7 @@ JAVA_OPTS="$JAVA_OPTS -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addre
 
 [ -f /opt/panaces/installconfig/Update_Default_Tomcat_Files ] && cp /opt/panaces/installconfig/Update_Default_Tomcat_Files/* $TOMCAT_HOME/webapps/ROOT
 sed -i.bak '$d' $TOMCAT_HOME/conf/web.xml && cat <<! >> $TOMCAT_HOME/conf/web.xml
-    <error-page\>
+    <error-page>
         <error-code>404</error-code>
         <location>/index.jsp</location>
     </error-page>
@@ -81,7 +81,7 @@ wget -q https://sourceforge.net/projects/gnu-utils/files/binaries/ThirdPartyJSLi
 [ -f $TOMCAT_HOME/webapps/PanacesGUI/WEB-INF/lib/PanacesGUI.jar ] && cp $TOMCAT_HOME/webapps/PanacesGUI/WEB-INF/lib/PanacesGUI.jar $TOMCAT_HOME/webapps/PanacesGUI/WEB-INF/lib/PanacesGUI.jar.bak
 
 echo "Pasos post instalación - reportes birt"
-unzip -qd /install /install/birt-runtime-4_3_2.zip && mv /install/birt-runtime-4_3_2/WebViewerExample $TOMCAAT_HOME/webapps/birt \
+unzip -qd /install /install/birt-runtime-4_3_2.zip && mv /install/birt-runtime-4_3_2/WebViewerExample $TOMCAT_HOME/webapps/birt \
     && cd $TOMCAT_HOME/webapps && cp -r PanacesGUI/report/ birt && cp PanacesGUI/WEB-INF/lib/mariadb-java-client-2.3.0.jar birt/report \
     && chown -R tomcatuser:tomcatusergroup birt
 
@@ -96,10 +96,23 @@ export EAMSROOT=/opt/panaces
 export RMI_SERVER_IP=crort
 
 echo "Iniciando mariadb"
-systemctl status mariadb || systemctl start mariadb
+#systemctl status mariadb || systemctl start mariadb
+/usr/sbin/mysqld --user=root --silent-startup &
 
+echo "Iniciando RO"
 cd /opt/panaces/bin
 ./panaces start
 ./panaces status
-tail -f $EAMSROOT/var/log/console.log
+tail -f \$EAMSROOT/var/log/console.log
 !
+
+cat > stop <<!
+echo "Preparando variables de ambiente"
+export EAMSROOT=/opt/panaces
+export RMI_SERVER_IP=crort
+
+echo "Deteniendo RO"
+cd /opt/panaces/bin
+./panaces stop
+!
+chmod 775 start stop

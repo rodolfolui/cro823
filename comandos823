@@ -1,4 +1,5 @@
 # Copiar los medios de instalación
+[ -d cro823 ] || mkdirp -p cro823
 [ -f cro823/Server_BundledTomcat.tar.gz ] || cp /home/rvasquez/DownloadDirector/CRO823/Server_BundledTomcat.tar.gz cro823
 [ -f cro823/gnulib.zip ] || wget -O cro823/gnulib.zip https://sourceforge.net/projects/gnu-utils/files/binaries/gnulib.zip/download 
 [ -f cro823/ThirdPartyJSLib.zip ] || wget -O cro823/ThirdPartyJSLib.zip https://sourceforge.net/projects/gnu-utils/files/binaries/ThirdPartyJSLib.zip/download
@@ -20,5 +21,12 @@ podman exec -i -t base1 /bin/bash -c "cd /install/ ; [ -f install.bin ] || tar x
 
 # Preparar los prerequisitos de CRO
 podman build -f Dockerfile.cro823 --tag localhost/cro:823
-podman run --rm -it -v cro823:/install --name crort localhost/cro:823 bash -c /instcro823 && podman commit crort cro:823
-#podman run --rm -it -v cro823:/install --name crort localhost/cro:823 bash
+podman run --rm -v cro823:/install -p 8080:8080 -p 8443:8443 -p 3306:3306 --name crort localhost/cro:823 bash -c "tail -f /dev/null" &
+
+# Crear imagen runtime
+podman exec -it crort /bin/bash -c "/instcro823" && podman commit crort cro:823
+
+# Ejecutar posteriormente
+#podman commit crort cro:8.2.3
+#podman run --rm -it -v cro823:/install -p 8306:8306 -p 8080:8080 -p 8443:8443 --name crort localhost/cro:8.2.3 bash
+#podman run --rm -it -p 8306:8306 -p 8080:8080 -p 8443:8443 --name crort localhost/cro:8.2.3 bash
